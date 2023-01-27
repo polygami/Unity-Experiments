@@ -15,6 +15,8 @@ public class Atom : MonoBehaviour
 	[SerializeField] public float MaxRotation;
 	[SerializeField] public float NucleusRadius = 1;
 	[SerializeField] public float NucleonRelativeDistance = 1;
+	[SerializeField] public bool IsEveryNucleonScaled = true;
+	[SerializeField] public bool IsNucleusScaled = false;
 	private int _nucleons;
 	public int Nucleons
 	{
@@ -49,16 +51,18 @@ public class Atom : MonoBehaviour
 		// float v = Nucleons * NucleusRadius;
 		float v = Nucleons;
 		float volumeToSurfaceArea = Mathf.Sqrt(v / π4);
-		float test = volumeToSurfaceArea * NucleusRadius / Nucleons;
-		float multiplier = volumeToSurfaceArea * NucleusRadius;
+		// float test = volumeToSurfaceArea * NucleusRadius / Nucleons;
+		float scaleMultiplier = volumeToSurfaceArea / NucleusRadius;
+		Vector3 nucleonScale = IsEveryNucleonScaled ? Vector3.one / volumeToSurfaceArea * NucleusRadius : Vector3.one * NucleusRadius;
+		float nucleusScale = IsEveryNucleonScaled ? NucleusRadius : volumeToSurfaceArea * NucleusRadius;
 		// float multiplier = volumeToSurfaceArea * test;
 
 		for (int i = 0; i < points.Length; i++)
 		{
 			Vector3 point = points[i];
 			// Instantiate and parent to atom
-			GameObject obj = Instantiate(Model, point * multiplier, new Quaternion(), gameObject.transform);
-			obj.transform.localScale = Vector3.one * NucleusRadius;
+			GameObject obj = Instantiate(Model, point * nucleusScale, new Quaternion(), gameObject.transform);
+			obj.transform.localScale = nucleonScale;
 			//Apply Material
 			obj.GetComponent<Renderer>().material = isProtonArray[i] ? ProtonMaterial : NeutronMaterial;
 		}
